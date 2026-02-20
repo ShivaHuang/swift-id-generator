@@ -39,11 +39,11 @@ import ConcurrencyExtras
 /// }
 /// ```
 public protocol Generate: Sendable {
-    /// The default generator instance.
-    ///
-    /// Returned by ``IDGenerator/subscript(_:)`` when no generator has been
-    /// explicitly registered for a given key.
-    static var `default`: Self { get }
+  /// The default generator instance.
+  ///
+  /// Returned by ``IDGenerator/subscript(_:)`` when no generator has been
+  /// explicitly registered for a given key.
+  static var `default`: Self { get }
 }
 
 /// A keyed registry of generators.
@@ -80,25 +80,25 @@ public protocol Generate: Sendable {
 /// }
 /// ```
 public struct IDGenerator: Sendable {
-    private var store: [AnyHashableSendable: any Generate] = [:]
+  private var store: [AnyHashableSendable: any Generate] = [:]
 
-    /// Creates an empty generator registry.
-    public init() {}
+  /// Creates an empty generator registry.
+  public init() {}
 
-    /// Accesses the generator for the given key.
-    ///
-    /// Returns the stored generator if one has been registered, or
-    /// ``Generate/default`` if the key has not been assigned.
-    ///
-    /// - Parameter key: A ``GenerateIdentifier`` identifying the use case.
-    public subscript<Value: Generate>(_ key: GenerateIdentifier<Value>) -> Value {
-        get {
-            (store[AnyHashableSendable(key)] as? Value) ?? Value.default
-        }
-        set {
-            store[AnyHashableSendable(key)] = newValue
-        }
+  /// Accesses the generator for the given key.
+  ///
+  /// Returns the stored generator if one has been registered, or
+  /// ``Generate/default`` if the key has not been assigned.
+  ///
+  /// - Parameter key: A ``GenerateIdentifier`` identifying the use case.
+  public subscript<Value: Generate>(_ key: GenerateIdentifier<Value>) -> Value {
+    get {
+      (store[AnyHashableSendable(key)] as? Value) ?? Value.default
     }
+    set {
+      store[AnyHashableSendable(key)] = newValue
+    }
+  }
 }
 
 /// A typed key that identifies a generator within an ``IDGenerator``.
@@ -117,18 +117,18 @@ public struct IDGenerator: Sendable {
 /// }
 /// ```
 public struct GenerateIdentifier<Value: Generate>: Hashable, Sendable {
-    /// The raw string that identifies this key.
-    public let identifier: String
+  /// The raw string that identifies this key.
+  public let identifier: String
 
-    /// Creates an identifier with the given string.
-    ///
-    /// Prefer defining keys as `static let` properties on `GenerateIdentifier`
-    /// extensions rather than constructing values inline, so the raw string is
-    /// declared in exactly one place.
-    ///
-    /// - Parameter identifier: A string that uniquely identifies the use case
-    ///   for the given `Value` type.
-    public init(_ identifier: String) {
-        self.identifier = identifier
-    }
+  /// Creates an identifier with the given string.
+  ///
+  /// Prefer defining keys as `static let` properties on `GenerateIdentifier`
+  /// extensions rather than constructing values inline, so the raw string is
+  /// declared in exactly one place.
+  ///
+  /// - Parameter identifier: A string that uniquely identifies the use case
+  ///   for the given `Value` type.
+  public init(_ identifier: String) {
+    self.identifier = identifier
+  }
 }
