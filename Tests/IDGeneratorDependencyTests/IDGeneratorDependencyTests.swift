@@ -13,30 +13,30 @@ import Testing
 
 @Suite("IDGeneratorDependency Tests")
 struct IDGeneratorDependencyTests {
-  @Dependency(\.idGenerator) var idGenerator
+  @Dependency(\.idGenerator.userID) var userID
 
   @Test("IDGeneratorDependency")
   func idGeneratorDependency() {
     withDependencies {
-      $0.idGenerator.databaseEntry = .incrementing
+      $0.idGenerator.userID = .incrementing
     } operation: {
       #expect(
-        self.idGenerator.databaseEntry() == UUID(uuidString: "00000000-0000-0000-0000-000000000000")
+        self.userID() == UUID(uuidString: "00000000-0000-0000-0000-000000000000")
       )
       #expect(
-        self.idGenerator.databaseEntry() == UUID(uuidString: "00000000-0000-0000-0000-000000000001")
+        self.userID() == UUID(uuidString: "00000000-0000-0000-0000-000000000001")
       )
     }
   }
 }
 
 extension GenerateIdentifier where Value == UUIDGenerator {
-  static let databaseEntry = Self("databaseEntry")
+  static let userID = Self("userID")
 }
 
 extension IDGenerator {
-  var databaseEntry: UUIDGenerator {
-    get { self[.databaseEntry] }
-    set { self[.databaseEntry] = newValue }
+  var userID: UUIDGenerator {
+    get { self[.userID] }
+    set { self[.userID] = newValue }
   }
 }

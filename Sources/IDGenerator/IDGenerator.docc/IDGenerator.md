@@ -26,35 +26,46 @@ after the **use case**, not the generator type:
 
 ```swift
 extension GenerateIdentifier where Value == UUIDGenerator {
-    static let databaseEntry = Self("databaseEntry")
+    static let userID = Self("userID")
 }
 
 extension IDGenerator {
-    var databaseEntry: UUIDGenerator {
-        get { self[.databaseEntry] }
-        set { self[.databaseEntry] = newValue }
+    var userID: UUIDGenerator {
+        get { self[.userID] }
+        set { self[.userID] = newValue }
     }
 }
 ```
 
-### Generating IDs
+### Scoped Injection
 
-Call the accessor directly to produce an ID:
+In most components, only one ID generator is needed. Inject it directly by its
+key path so the component declares exactly what it depends on — nothing more:
 
 ```swift
-let id = idGenerator.databaseEntry()
+struct UserRepository {
+    @Dependency(\.idGenerator.userID) var userID
+
+    func createUser() -> User {
+        User(id: userID())
+    }
+}
 ```
 
-### Swapping Generators
+This is more precise than injecting the whole registry and mirrors how
+`@Dependency(\.uuid)` is used in swift-dependencies.
+
+### Swapping Generators in Tests
 
 Because each use case has its own key, generators can be replaced independently —
 for example, using `.incrementing` in tests for predictable output:
 
 ```swift
 withDependencies {
-    $0.idGenerator.databaseEntry = .incrementing
+    $0.idGenerator.userID = .incrementing
 } operation: {
-    let id = idGenerator.databaseEntry() // 00000000-0000-0000-0000-000000000000
+    let first  = userID() // 00000000-0000-0000-0000-000000000000
+    let second = userID() // 00000000-0000-0000-0000-000000000001
 }
 ```
 
