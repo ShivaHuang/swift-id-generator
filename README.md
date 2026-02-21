@@ -1,4 +1,4 @@
-# swift-id-generator
+# IDGenerator
 
 A flexible, keyed registry of ID generators for Swift.
 
@@ -42,17 +42,17 @@ The package ships two libraries:
 
 ### 1. Conform a Generator
 
-Conform your generator type to `Generate` and provide a `default` instance:
+Conform your generator type to `IDGenerator` and provide a `default` instance:
 
 ```swift
-struct SequentialIDGenerator: Generate {
+struct SequentialIDGenerator: IDGenerator {
     static let `default` = SequentialIDGenerator()
 
     func callAsFunction() -> Int { ... }
 }
 ```
 
-> **Note:** If you're using `IDGeneratorDependency`, a `Generate` conformance for
+> **Note:** If you're using `IDGeneratorDependency`, a `IDGenerator` conformance for
 > `UUIDGenerator` is already provided out of the box — no extra setup needed.
 
 ### 2. Register a Key and Accessor

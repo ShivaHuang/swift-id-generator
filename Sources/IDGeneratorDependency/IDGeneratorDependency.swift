@@ -47,13 +47,13 @@ extension DependencyValues {
   }
 }
 
-/// `UUIDGenerator` conforms to ``Generate``, making it usable as a generator
+/// `UUIDGenerator` conforms to ``IDGenerator``, making it usable as a generator
 /// inside an ``IDGeneratorValues``.
 ///
-/// The ``Generate/default`` delegates to the `\.uuid` dependency, so it
+/// The ``IDGenerator/default`` delegates to the `\.uuid` dependency, so it
 /// automatically respects any `\.uuid` override set in the current dependency
 /// context.
-extension UUIDGenerator: Generate {
+extension UUIDGenerator: IDGenerator {
   public static let `default` = UUIDGenerator {
     @Dependency(\.uuid) var uuid
     return uuid()

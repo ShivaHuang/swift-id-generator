@@ -8,7 +8,7 @@ Integrates ``IDGeneratorValues`` with [swift-dependencies](https://github.com/po
 [swift-dependencies](https://github.com/pointfreeco/swift-dependencies) dependency,
 accessible via `@Dependency(\.idGenerators)`.
 
-It also provides a ``Generate`` conformance for `UUIDGenerator` out of the box,
+It also provides a ``IDGenerator`` conformance for `UUIDGenerator` out of the box,
 delegating to the `\.uuid` dependency so it automatically respects any override
 set in the current dependency context.
 

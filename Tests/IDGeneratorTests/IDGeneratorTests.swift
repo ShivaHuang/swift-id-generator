@@ -4,13 +4,13 @@ import Testing
 
 // MARK: - Test Helpers
 
-struct FixedGenerator: Generate {
+struct FixedGenerator: IDGenerator {
   let value: String
   static let `default` = FixedGenerator(value: "default")
   func callAsFunction() -> String { value }
 }
 
-struct AnotherGenerator: Generate {
+struct AnotherGenerator: IDGenerator {
   let value: Int
   static let `default` = AnotherGenerator(value: 0)
   func callAsFunction() -> Int { value }

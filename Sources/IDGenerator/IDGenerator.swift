@@ -9,14 +9,14 @@ import ConcurrencyExtras
 
 /// A type that can be stored in an ``IDGeneratorValues`` and provides a default instance.
 ///
-/// Conform your generator types to `Generate` to make them usable with
+/// Conform your generator types to `IDGenerator` to make them usable with
 /// ``IDGeneratorValues``. The only requirement is a ``default`` instance, which is
 /// returned when no generator has been explicitly registered for a given key.
 ///
 /// ## Conforming a Generator
 ///
 /// ```swift
-/// extension UUIDGenerator: Generate {
+/// extension UUIDGenerator: IDGenerator {
 ///     public static let `default` = UUIDGenerator { UUID() }
 /// }
 /// ```
@@ -38,7 +38,7 @@ import ConcurrencyExtras
 ///     }
 /// }
 /// ```
-public protocol Generate: Sendable {
+public protocol IDGenerator: Sendable {
   /// The default generator instance.
   ///
   /// Returned by ``IDGeneratorValues/subscript(_:)`` when no generator has been
@@ -50,7 +50,7 @@ public protocol Generate: Sendable {
 ///
 /// `IDGeneratorValues` stores a collection of generators, each associated with a
 /// ``GeneratorKey`` key. Accessing a key that has not been set returns
-/// the generator type's ``Generate/default``.
+/// the generator type's ``IDGenerator/default``.
 ///
 /// The recommended pattern is to access generators through semantic computed
 /// properties on `IDGeneratorValues`, defined alongside a matching ``GeneratorKey``
@@ -80,7 +80,7 @@ public protocol Generate: Sendable {
 /// }
 /// ```
 public struct IDGeneratorValues: Sendable {
-  private var store: [AnyHashableSendable: any Generate] = [:]
+  private var store: [AnyHashableSendable: any IDGenerator] = [:]
 
   /// Creates an empty generator registry.
   public init() {}
@@ -88,10 +88,10 @@ public struct IDGeneratorValues: Sendable {
   /// Accesses the generator for the given key.
   ///
   /// Returns the stored generator if one has been registered, or
-  /// ``Generate/default`` if the key has not been assigned.
+  /// ``IDGenerator/default`` if the key has not been assigned.
   ///
   /// - Parameter key: A ``GeneratorKey`` identifying the use case.
-  public subscript<Value: Generate>(_ key: GeneratorKey<Value>) -> Value {
+  public subscript<Value: IDGenerator>(_ key: GeneratorKey<Value>) -> Value {
     get {
       (store[AnyHashableSendable(key)] as? Value) ?? Value.default
     }
@@ -116,7 +116,7 @@ public struct IDGeneratorValues: Sendable {
 ///     static let sessionToken = Self("sessionToken")
 /// }
 /// ```
-public struct GeneratorKey<Value: Generate>: Hashable, Sendable {
+public struct GeneratorKey<Value: IDGenerator>: Hashable, Sendable {
   /// The raw string that identifies this key.
   public let identifier: String
 

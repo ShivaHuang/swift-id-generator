@@ -10,11 +10,11 @@ deterministic generator during testing without changing the code under test.
 
 ### Defining a Generator
 
-Conform your generator type to ``Generate`` and provide a ``Generate/default``
+Conform your generator type to ``IDGenerator`` and provide a ``IDGenerator/default``
 instance:
 
 ```swift
-extension UUIDGenerator: Generate {
+extension UUIDGenerator: IDGenerator {
     public static let `default` = UUIDGenerator { UUID() }
 }
 ```
@@ -73,6 +73,6 @@ withDependencies {
 
 ### Core Types
 
-- ``Generate``
+- ``IDGenerator``
 - ``IDGeneratorValues``
 - ``GeneratorKey``
