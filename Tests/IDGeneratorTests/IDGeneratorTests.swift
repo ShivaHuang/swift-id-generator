@@ -16,17 +16,17 @@ struct AnotherGenerator: Generate {
   func callAsFunction() -> Int { value }
 }
 
-extension GenerateIdentifier where Value == FixedGenerator {
+extension GeneratorKey where Value == FixedGenerator {
   static let primary = Self("primary")
   static let secondary = Self("secondary")
   static let shared = Self("shared")
 }
 
-extension GenerateIdentifier where Value == AnotherGenerator {
+extension GeneratorKey where Value == AnotherGenerator {
   static let shared = Self("shared")
 }
 
-extension IDGenerator {
+extension IDGeneratorValues {
   var primary: FixedGenerator {
     get { self[.primary] }
     set { self[.primary] = newValue }
@@ -38,44 +38,44 @@ extension IDGenerator {
   }
 
   var fixedShared: FixedGenerator {
-    get { self[GenerateIdentifier<FixedGenerator>.shared] }
-    set { self[GenerateIdentifier<FixedGenerator>.shared] = newValue }
+    get { self[GeneratorKey<FixedGenerator>.shared] }
+    set { self[GeneratorKey<FixedGenerator>.shared] = newValue }
   }
 
   var anotherShared: AnotherGenerator {
-    get { self[GenerateIdentifier<AnotherGenerator>.shared] }
-    set { self[GenerateIdentifier<AnotherGenerator>.shared] = newValue }
+    get { self[GeneratorKey<AnotherGenerator>.shared] }
+    set { self[GeneratorKey<AnotherGenerator>.shared] = newValue }
   }
 }
 
 // MARK: - Tests
 
-@Suite("IDGenerator Tests")
+@Suite("IDGeneratorValues Tests")
 struct IDGeneratorTests {
 
   @Test("Returns default value when key is not set")
   func defaultFallback() {
-    let generator = IDGenerator()
+    let generator = IDGeneratorValues()
     #expect(generator.primary() == FixedGenerator.default.value)
   }
 
   @Test("Returns stored generator after set")
   func setAndGet() {
-    var generator = IDGenerator()
+    var generator = IDGeneratorValues()
     generator.primary = FixedGenerator(value: "custom")
     #expect(generator.primary() == "custom")
   }
 
   @Test("Setting one key does not affect another key")
   func keyIsolation() {
-    var generator = IDGenerator()
+    var generator = IDGeneratorValues()
     generator.primary = FixedGenerator(value: "value1")
     #expect(generator.secondary() == FixedGenerator.default.value)
   }
 
   @Test("Setting the same key twice returns the latest generator")
   func keyUpdate() {
-    var generator = IDGenerator()
+    var generator = IDGeneratorValues()
     generator.primary = FixedGenerator(value: "first")
     generator.primary = FixedGenerator(value: "second")
     #expect(generator.primary() == "second")
@@ -83,20 +83,20 @@ struct IDGeneratorTests {
 
   @Test("Identifiers with the same string are equal")
   func identifierEquality() {
-    let id1 = GenerateIdentifier<FixedGenerator>("key")
-    let id2 = GenerateIdentifier<FixedGenerator>("key")
+    let id1 = GeneratorKey<FixedGenerator>("key")
+    let id2 = GeneratorKey<FixedGenerator>("key")
     #expect(id1 == id2)
   }
 
   @Test("Identifiers with different strings are not equal")
   func identifierInequality() {
     #expect(
-      GenerateIdentifier<FixedGenerator>.primary != GenerateIdentifier<FixedGenerator>.secondary)
+      GeneratorKey<FixedGenerator>.primary != GeneratorKey<FixedGenerator>.secondary)
   }
 
   @Test("Same key string with different value types are stored independently")
   func typeIsolation() {
-    var generator = IDGenerator()
+    var generator = IDGeneratorValues()
     generator.fixedShared = FixedGenerator(value: "custom")
     #expect(generator.anotherShared() == AnotherGenerator.default.value)
   }

@@ -10,7 +10,7 @@ A flexible, keyed registry of ID generators for Swift.
 
 ## Overview
 
-`IDGenerator` lets you decouple your code from any specific ID generation strategy.
+`IDGeneratorValues` lets you decouple your code from any specific ID generation strategy.
 Generators are stored in a keyed registry under semantic, use-case-driven names — so
 you can swap in a deterministic generator during testing without changing the code under
 test.
@@ -20,11 +20,11 @@ key per use case and inject only what each component needs:
 
 ```swift
 struct UserRepository {
-    @Dependency(\.idGenerator.userID) var userID
+    @Dependency(\.idGenerators.userID) var userID
 }
 
 struct LogFileManager {
-    @Dependency(\.idGenerator.logFilename) var logFilename
+    @Dependency(\.idGenerators.logFilename) var logFilename
 }
 ```
 
@@ -57,15 +57,15 @@ struct SequentialIDGenerator: Generate {
 
 ### 2. Register a Key and Accessor
 
-Define a `GenerateIdentifier` key and an `IDGenerator` computed property, named after
+Define a `GeneratorKey` key and an `IDGeneratorValues` computed property, named after
 the **use case** — not the generator type:
 
 ```swift
-extension GenerateIdentifier where Value == UUIDGenerator {
+extension GeneratorKey where Value == UUIDGenerator {
     static let userID = Self("userID")
 }
 
-extension IDGenerator {
+extension IDGeneratorValues {
     var userID: UUIDGenerator {
         get { self[.userID] }
         set { self[.userID] = newValue }
@@ -79,7 +79,7 @@ Inject the scoped generator directly into your component:
 
 ```swift
 struct UserRepository {
-    @Dependency(\.idGenerator.userID) var userID
+    @Dependency(\.idGenerators.userID) var userID
 
     func createUser() -> User {
         User(id: userID())
@@ -95,7 +95,7 @@ Use `withDependencies` to replace a single generator with a deterministic altern
 @Test
 func createsUserWithIncrementingID() {
     withDependencies {
-        $0.idGenerator.userID = .incrementing
+        $0.idGenerators.userID = .incrementing
     } operation: {
         let repo = UserRepository()
         let user = repo.createUser()

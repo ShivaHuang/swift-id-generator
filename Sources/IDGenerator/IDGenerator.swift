@@ -7,10 +7,10 @@
 
 import ConcurrencyExtras
 
-/// A type that can be stored in an ``IDGenerator`` and provides a default instance.
+/// A type that can be stored in an ``IDGeneratorValues`` and provides a default instance.
 ///
 /// Conform your generator types to `Generate` to make them usable with
-/// ``IDGenerator``. The only requirement is a ``default`` instance, which is
+/// ``IDGeneratorValues``. The only requirement is a ``default`` instance, which is
 /// returned when no generator has been explicitly registered for a given key.
 ///
 /// ## Conforming a Generator
@@ -23,48 +23,48 @@ import ConcurrencyExtras
 ///
 /// ## Defining a Key and Accessor
 ///
-/// Pair your conformance with a ``GenerateIdentifier`` key and an ``IDGenerator``
+/// Pair your conformance with a ``GeneratorKey`` key and an ``IDGeneratorValues``
 /// computed property, named after the **use case** rather than the generator type:
 ///
 /// ```swift
-/// extension GenerateIdentifier where Value == UUIDGenerator {
-///     static let databaseEntry = Self("databaseEntry")
+/// extension GeneratorKey where Value == UUIDGenerator {
+///     static let userID = Self("userID")
 /// }
 ///
-/// extension IDGenerator {
-///     var databaseEntry: UUIDGenerator {
-///         get { self[.databaseEntry] }
-///         set { self[.databaseEntry] = newValue }
+/// extension IDGeneratorValues {
+///     var userID: UUIDGenerator {
+///         get { self[.userID] }
+///         set { self[.userID] = newValue }
 ///     }
 /// }
 /// ```
 public protocol Generate: Sendable {
   /// The default generator instance.
   ///
-  /// Returned by ``IDGenerator/subscript(_:)`` when no generator has been
+  /// Returned by ``IDGeneratorValues/subscript(_:)`` when no generator has been
   /// explicitly registered for a given key.
   static var `default`: Self { get }
 }
 
 /// A keyed registry of generators.
 ///
-/// `IDGenerator` stores a collection of generators, each associated with a
-/// ``GenerateIdentifier`` key. Accessing a key that has not been set returns
+/// `IDGeneratorValues` stores a collection of generators, each associated with a
+/// ``GeneratorKey`` key. Accessing a key that has not been set returns
 /// the generator type's ``Generate/default``.
 ///
 /// The recommended pattern is to access generators through semantic computed
-/// properties on `IDGenerator`, defined alongside a matching ``GenerateIdentifier``
+/// properties on `IDGeneratorValues`, defined alongside a matching ``GeneratorKey``
 /// key — named after the **use case**, not the generator type:
 ///
 /// ```swift
-/// extension GenerateIdentifier where Value == UUIDGenerator {
-///     static let databaseEntry = Self("databaseEntry")
+/// extension GeneratorKey where Value == UUIDGenerator {
+///     static let userID = Self("userID")
 /// }
 ///
-/// extension IDGenerator {
-///     var databaseEntry: UUIDGenerator {
-///         get { self[.databaseEntry] }
-///         set { self[.databaseEntry] = newValue }
+/// extension IDGeneratorValues {
+///     var userID: UUIDGenerator {
+///         get { self[.userID] }
+///         set { self[.userID] = newValue }
 ///     }
 /// }
 /// ```
@@ -74,12 +74,12 @@ public protocol Generate: Sendable {
 ///
 /// ```swift
 /// withDependencies {
-///     $0.idGenerator.databaseEntry = .incrementing
+///     $0.idGenerators.userID = .incrementing
 /// } operation: {
-///     let id = idGenerator.databaseEntry() // 00000000-0000-0000-0000-000000000000
+///     let id = userID() // 00000000-0000-0000-0000-000000000000
 /// }
 /// ```
-public struct IDGenerator: Sendable {
+public struct IDGeneratorValues: Sendable {
   private var store: [AnyHashableSendable: any Generate] = [:]
 
   /// Creates an empty generator registry.
@@ -90,8 +90,8 @@ public struct IDGenerator: Sendable {
   /// Returns the stored generator if one has been registered, or
   /// ``Generate/default`` if the key has not been assigned.
   ///
-  /// - Parameter key: A ``GenerateIdentifier`` identifying the use case.
-  public subscript<Value: Generate>(_ key: GenerateIdentifier<Value>) -> Value {
+  /// - Parameter key: A ``GeneratorKey`` identifying the use case.
+  public subscript<Value: Generate>(_ key: GeneratorKey<Value>) -> Value {
     get {
       (store[AnyHashableSendable(key)] as? Value) ?? Value.default
     }
@@ -101,28 +101,28 @@ public struct IDGenerator: Sendable {
   }
 }
 
-/// A typed key that identifies a generator within an ``IDGenerator``.
+/// A typed key that identifies a generator within an ``IDGeneratorValues``.
 ///
-/// `GenerateIdentifier` pairs a string with a generator type, ensuring that two
+/// `GeneratorKey` pairs a string with a generator type, ensuring that two
 /// keys sharing the same string but with different `Value` types are stored
-/// independently inside an ``IDGenerator``.
+/// independently inside an ``IDGeneratorValues``.
 ///
 /// The recommended convention is to define keys as `static let` properties on
-/// `GenerateIdentifier` extensions, named after the use case:
+/// `GeneratorKey` extensions, named after the use case:
 ///
 /// ```swift
-/// extension GenerateIdentifier where Value == UUIDGenerator {
-///     static let databaseEntry = Self("databaseEntry")
-///     static let sessionToken  = Self("sessionToken")
+/// extension GeneratorKey where Value == UUIDGenerator {
+///     static let userID     = Self("userID")
+///     static let sessionToken = Self("sessionToken")
 /// }
 /// ```
-public struct GenerateIdentifier<Value: Generate>: Hashable, Sendable {
+public struct GeneratorKey<Value: Generate>: Hashable, Sendable {
   /// The raw string that identifies this key.
   public let identifier: String
 
   /// Creates an identifier with the given string.
   ///
-  /// Prefer defining keys as `static let` properties on `GenerateIdentifier`
+  /// Prefer defining keys as `static let` properties on `GeneratorKey`
   /// extensions rather than constructing values inline, so the raw string is
   /// declared in exactly one place.
   ///

@@ -13,12 +13,12 @@ import Testing
 
 @Suite("IDGeneratorDependency Tests")
 struct IDGeneratorDependencyTests {
-  @Dependency(\.idGenerator.userID) var userID
+  @Dependency(\.idGenerators.userID) var userID
 
   @Test("IDGeneratorDependency")
   func idGeneratorDependency() {
     withDependencies {
-      $0.idGenerator.userID = .incrementing
+      $0.idGenerators.userID = .incrementing
     } operation: {
       #expect(
         self.userID() == UUID(uuidString: "00000000-0000-0000-0000-000000000000")
@@ -30,11 +30,11 @@ struct IDGeneratorDependencyTests {
   }
 }
 
-extension GenerateIdentifier where Value == UUIDGenerator {
+extension GeneratorKey where Value == UUIDGenerator {
   static let userID = Self("userID")
 }
 
-extension IDGenerator {
+extension IDGeneratorValues {
   var userID: UUIDGenerator {
     get { self[.userID] }
     set { self[.userID] = newValue }

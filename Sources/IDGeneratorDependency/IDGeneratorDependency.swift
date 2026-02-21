@@ -8,47 +8,47 @@
 import Dependencies
 @_exported import IDGenerator
 
-extension IDGenerator: TestDependencyKey {
-  public static var testValue: IDGenerator {
-    IDGenerator()
+extension IDGeneratorValues: TestDependencyKey {
+  public static var testValue: IDGeneratorValues {
+    IDGeneratorValues()
   }
 }
 
-extension IDGenerator: DependencyKey {
-  public static var liveValue: IDGenerator {
-    IDGenerator()
+extension IDGeneratorValues: DependencyKey {
+  public static var liveValue: IDGeneratorValues {
+    IDGeneratorValues()
   }
 }
 
 extension DependencyValues {
-  /// The shared ``IDGenerator`` dependency.
+  /// The shared ``IDGeneratorValues`` dependency.
   ///
-  /// Access the registry via `@Dependency(\.idGenerator)`, then call the
-  /// appropriate generator for your use case:
+  /// Inject a specific generator directly by its key path for minimal,
+  /// explicit dependencies:
   ///
   /// ```swift
-  /// @Dependency(\.idGenerator) var idGenerator
+  /// @Dependency(\.idGenerators.userID) var userID
   ///
-  /// let id = idGenerator.databaseEntry()
+  /// let id = userID()
   /// ```
   ///
   /// Override specific generators in tests using ``withDependencies(_:operation:)``:
   ///
   /// ```swift
   /// withDependencies {
-  ///     $0.idGenerator.databaseEntry = .incrementing
+  ///     $0.idGenerators.userID = .incrementing
   /// } operation: {
-  ///     let id = idGenerator.databaseEntry() // 00000000-0000-0000-0000-000000000000
+  ///     let id = userID() // 00000000-0000-0000-0000-000000000000
   /// }
   /// ```
-  public var idGenerator: IDGenerator {
-    get { self[IDGenerator.self] }
-    set { self[IDGenerator.self] = newValue }
+  public var idGenerators: IDGeneratorValues {
+    get { self[IDGeneratorValues.self] }
+    set { self[IDGeneratorValues.self] = newValue }
   }
 }
 
 /// `UUIDGenerator` conforms to ``Generate``, making it usable as a generator
-/// inside an ``IDGenerator``.
+/// inside an ``IDGeneratorValues``.
 ///
 /// The ``Generate/default`` delegates to the `\.uuid` dependency, so it
 /// automatically respects any `\.uuid` override set in the current dependency

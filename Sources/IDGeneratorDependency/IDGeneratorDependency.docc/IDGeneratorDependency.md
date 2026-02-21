@@ -1,12 +1,12 @@
 # ``IDGeneratorDependency``
 
-Integrates ``IDGenerator`` with [swift-dependencies](https://github.com/pointfreeco/swift-dependencies).
+Integrates ``IDGeneratorValues`` with [swift-dependencies](https://github.com/pointfreeco/swift-dependencies).
 
 ## Overview
 
-`IDGeneratorDependency` exposes an ``IDGenerator`` instance as a
+`IDGeneratorDependency` exposes an ``IDGeneratorValues`` instance as a
 [swift-dependencies](https://github.com/pointfreeco/swift-dependencies) dependency,
-accessible via `@Dependency(\.idGenerator)`.
+accessible via `@Dependency(\.idGenerators)`.
 
 It also provides a ``Generate`` conformance for `UUIDGenerator` out of the box,
 delegating to the `\.uuid` dependency so it automatically respects any override
@@ -20,7 +20,7 @@ by its key path keeps dependencies minimal and explicit:
 
 ```swift
 struct UserRepository {
-    @Dependency(\.idGenerator.userID) var userID
+    @Dependency(\.idGenerators.userID) var userID
 
     func createUser() -> User {
         User(id: userID())
@@ -34,7 +34,7 @@ Swap a single generator without affecting the rest of the registry:
 
 ```swift
 withDependencies {
-    $0.idGenerator.userID = .incrementing
+    $0.idGenerators.userID = .incrementing
 } operation: {
     let first  = userID() // 00000000-0000-0000-0000-000000000000
     let second = userID() // 00000000-0000-0000-0000-000000000001
@@ -45,7 +45,7 @@ withDependencies {
 
 ### Dependency Access
 
-- ``DependencyValues/idGenerator``
+- ``DependencyValues/idGenerators``
 
 ### Built-in Conformances
 
