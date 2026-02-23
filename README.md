@@ -10,10 +10,9 @@ A flexible, keyed registry of ID generators for Swift.
 
 ## Overview
 
-`IDGeneratorValues` lets you decouple your code from any specific ID generation strategy.
-Generators are stored in a keyed registry under semantic, use-case-driven names — so
-you can swap in a deterministic generator during testing without changing the code under
-test.
+The **IDGenerator** package provides `IDGeneratorValues`, a keyed registry of generators
+that lets you decouple your code from any specific ID generation strategy — so you can
+swap in a deterministic generator during testing without changing the code under test.
 
 Rather than coupling a component to a single generator type (e.g. `UUID`), you define a
 key per use case and inject only what each component needs:
